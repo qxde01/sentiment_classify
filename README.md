@@ -6,3 +6,5 @@
 
 ## 数据源
 数据主要来自大众点评、美团、糯米的评论，少量的京东评论，其中餐馆的用户评论最多，原始数据大约103万
+## 正负面二分类
+![val_acc](https://github.com/qxde01/sentiment_classify/blob/master/data/val_acc.png)
