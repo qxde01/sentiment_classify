@@ -7,6 +7,7 @@ from keras.layers.wrappers import Bidirectional,TimeDistributed
 from sklearn import metrics
 from keras import backend as K
 from Capsule_Keras import *
+from attention_keras import *
 # train a 1D convnet with global maxpooling
 
 def recall_threshold(threshold = 0.5):
@@ -169,4 +170,24 @@ def GRU_Capsule_train(x_train,y_train,x_test,y_test,gru_len=128,embedding_layer=
     print("\nTest score: %.4f, accuracy: %.4f, recall: %.4f,precision: %.4f" % (score, acc,recall,precision))
     print('&&end&&' * 10)
 
-
+def attention_train(x_train,y_train,x_test,y_test,embedding_layer='',model_name=''):
+    y_test = to_categorical(y_test)
+    y_train = to_categorical(y_train)
+    num_classes = y_train.shape[1]
+    S_inputs = Input(shape=(None,), dtype='int32')
+    embeddings = embedding_layer(S_inputs)
+    # embeddings = Position_Embedding()(embeddings) # 增加Position_Embedding能轻微提高准确率
+    O_seq = Attention(3, 32)([embeddings, embeddings, embeddings])
+    O_seq = GlobalAveragePooling1D()(O_seq)
+    O_seq = Dropout(0.5)(O_seq)
+    outputs = Dense(num_classes, activation='sigmoid')(O_seq)
+    model = Model(inputs=S_inputs, outputs=outputs)
+    filepath="model/attention_"+model_name+"_{epoch:02d}-{val_acc:.2f}.hdf5"
+    checkpoint = ModelCheckpoint(filepath, save_best_only=True,verbose=1, mode='auto')
+    callbacks_list = [checkpoint]
+    model.summary()
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc',recall_threshold(0.5),precision_threshold(0.5)])
+    model.fit(x_train, y_train,batch_size=128,epochs=30,validation_data=(x_test, y_test),callbacks=callbacks_list)
+    score, acc,recall,precision= model.evaluate(x_test, y_test, batch_size=128)
+    print("\nTest score: %.4f, accuracy: %.4f, recall: %.4f,precision: %.4f" % (score, acc,recall,precision))
+    print('&&end&&' * 10)
