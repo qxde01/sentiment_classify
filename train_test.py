@@ -23,6 +23,9 @@ CNN_LSTM_train(x_train, y_train, x_test, y_test, embedding_layer=embedding_layer
 print('train GRU_Capsule model of score 1,5 .....')
 GRU_Capsule_train(x_train, y_train, x_test, y_test, gru_len=128, embedding_layer=embedding_layer,
                   model_name='score_1_5')
+print('train Attention model of score 1,5 .....')
+attention_train(x_train,y_train,x_test,y_test,embedding_layer=embedding_layer,model_name='score_1_5')
+
 
 x_train, y_train, x_test, y_test, embedding_matrix, embedding_layer = build_data(
     data_file=data_file, word2vec_file=word2vec_file, max_num_words=max_num_words,
