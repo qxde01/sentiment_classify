@@ -5,6 +5,7 @@ import fasttext
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras.layers import Embedding
+from tqdm import tqdm
 
 def build_data(data_file='data/comments_words_sample.csv',
                word2vec_file='model/word2vec_skip_128.bin',
@@ -44,15 +45,15 @@ def build_data(data_file='data/comments_words_sample.csv',
     y_test = labels[-num_validation_samples:]
     num_words = min(max_num_words, w2v_words_num+ 1,len(word_index)+1)
     embedding_matrix = np.zeros((num_words, embeddings_dim))
-    for word, i in word_index.items():
-        if i >= max_num_words:
+    for word, i in tqdm(word_index.items()):
+        if i >= num_words:
             continue
         #embedding_vector = w2v_model(word)
         if w2v_words_list.__contains__(word) :
             # words not found in embedding index will be all-zeros.
             embedding_matrix[i] = w2v_model[word]
-        if i %1001==0:
-            print('process words:',i)
+        #if i %1001==0:
+        #    print('process words:',i)
     print('embedding matrix shape:',(num_words, embeddings_dim))
     # load pre-trained word embeddings into an Embedding layer
     # note that we set trainable = False so as to keep the embeddings fixed
@@ -66,20 +67,20 @@ def build_data(data_file='data/comments_words_sample.csv',
         n2=x_test.shape[0]
         X_train=np.zeros((n1, max_text_word, embeddings_dim), dtype=np.float32)
         X_test = np.zeros((n2, max_text_word, embeddings_dim), dtype=np.float32)
-        for i in range(0,n1):
+        for i in tqdm(range(0,n1)):
             z=x_train[i,:]
             for j in range(0,max_text_word):
                 if z[j]>0:
                     X_train[i, j, :] = embedding_matrix[z[j]]
-            if i% 1001==0:
-                print('gen train data vector:', i + 1)
-        for i in range(0,n2):
+            #if i% 1001==0:
+            #    print('gen train data vector:', i + 1)
+        for i in tqdm(range(0,n2)):
             z=x_test[i,:]
             for j in range(0,max_text_word):
                 if z[j]>0:
                     X_test[i, j, :] = embedding_matrix[z[j]]
-            if i% 1001==0:
-                print('gen test data vector:', i + 1)
+            #if i% 1001==0:
+            #    print('gen test data vector:', i + 1)
         X_train = X_train.reshape(n1, max_text_word, embeddings_dim, 1)
         X_test = X_test.reshape(n2, max_text_word, embeddings_dim, 1)
         return X_train,y_train,X_test,y_test,embedding_matrix,embedding_layer
