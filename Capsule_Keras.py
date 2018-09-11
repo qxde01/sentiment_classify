@@ -74,4 +74,8 @@ class Capsule(Layer):
 
     def compute_output_shape(self, input_shape):
         return (None, self.num_capsule, self.dim_capsule)
-
+    
+    def get_config(self):
+        config = {'num_capsule': self.num_capsule,'dim_capsule':self.dim_capsule}
+        base_config = super(Capsule, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
