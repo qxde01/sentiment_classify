@@ -60,7 +60,7 @@ def atten_val(X,x_val,model_path,col_list=col_list):
     return y_pred, F1
 
 def test_pred(x_test,model_path='biGRU'):
-    X=pd.read_csv('data1/sentiment_analysis_testa.csv')
+    X=pd.read_csv('rawdata/sentiment_analysis_testa.csv')
     model = load_model(model_path, custom_objects={'F1_macro': F1_macro})
     y_pred = model.predict(x_test, batch_size=64, verbose=1)
     for i in range(0,20):
@@ -71,6 +71,6 @@ def test_pred(x_test,model_path='biGRU'):
     return X
 
 if __name__ == "__main__":
-    X = pd.read_csv('data1/sentiment_analysis_validationset.csv')
+    X = pd.read_csv('rawdata/sentiment_analysis_validationset.csv')
     x_train, y_train, x_val, y_val, x_test = get_data(max_num_word=7200, max_len_word=1500, level='char')
     resu = model_val(X=X, x_val=x_val, model_path='model/CNN1D_GRU_010-14.1442.h5')
