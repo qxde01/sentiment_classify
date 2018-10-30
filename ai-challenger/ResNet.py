@@ -44,6 +44,7 @@ def bottleneck_Block(x,nb_filters,strides=1,with_conv_shortcut=False):
 def build_resnet(max_num_word=210000,max_len_word=600):
     input1 = Input(shape=(max_len_word,), dtype='int32', name='input1')
     x1 = Embedding(output_dim=64, input_dim=max_num_word, input_length=max_len_word, name='embedding_0')(input1)
+    x1 = Bidirectional(GRU(64, dropout=0.25, recurrent_dropout=0.35, return_sequences=True),input_shape=(max_len_word, 64))(x1)
     #conv1
     x = Conv1d_BN(x1,nb_filter=64, kernel_size=2, strides=1, padding='valid')
     #x = MaxPooling1D(pool_size=2, padding='same')(x)
